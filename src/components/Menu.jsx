@@ -1,4 +1,4 @@
-// Menu de configuration: ajout joueurs, mode, backlog, sauvegarde
+// Menu de configuration
 
 import { useRef, useState } from "react";
 import "./Menu.css";
