@@ -21,30 +21,34 @@ export default function App() {
   const [finals, setFinals] = useState({});
   const [started, setStarted] = useState(false);
 
-  //Nouveau : joueur dont on affiche les cartes
+  // numéro du tour pour l’US courante (1 = premier tour)
+  const [round, setRound] = useState(1);
+
+  // joueur dont on affiche les cartes (pour vue "un joueur à la fois")
   const [viewPlayer, setViewPlayer] = useState("");
 
+  // US en cours
   const currentUS = started && backlog.length > 0 ? backlog[index] : undefined;
 
-  // Votes numériques uniquement
+  // Votes numériques uniquement (on ignore café et ?)
   const numericVotes = useMemo(
     () => Object.values(votes).filter((v) => typeof v === "number"),
     [votes]
   );
-
   // Tous les joueurs ont voté
   const canReveal = players.length > 0 && players.every((p) => p in votes);
 
-  // Garder une vue joueur cohérente quand la liste change
+  // Garder une vue joueur cohérente quand la liste des joueurs change
   useEffect(() => {
     if (players.length === 0) {
       setViewPlayer("");
     } else if (!players.includes(viewPlayer)) {
-      setViewPlayer(players[0]); // premier joueur par défaut
+      // Si le joueur sélectionné n’existe plus, on prend le premier
+      setViewPlayer(players[0]);
     }
   }, [players, viewPlayer]);
 
-  //Lancer / relancer la partie
+  // Lancer / relancer la partie
   const handleStart = () => {
     if (players.length === 0) {
       alert("Ajoute au moins un joueur avant de lancer la partie.");
@@ -58,26 +62,29 @@ export default function App() {
     setIndex(0);
     setVotes({});
     setRevealed(false);
+    setFinals({});
     setStarted(true);
+    setRound(1); // on commence toujours au tour 1 pour la première US
   };
 
   // Un joueur clique sur une carte
   const onVote = (player, card) => {
-    if (revealed) return; // si c'est déjà révélé, on ne change plus
+    if (revealed) return; // si les cartes sont déjà révélées, on ne change plus
     setVotes((prev) => ({ ...prev, [player]: card }));
   };
 
+  // Révéler les votes
   const onReveal = () => {
     setRevealed(true);
   };
 
-  // Passer à l'US suivante (ou finir)
+  // Passer à l’US suivante (ou finir le backlog)
   const onNext = () => {
     if (!currentUS) return;
 
     const currId = currentUS.id ?? `US${index + 1}`;
 
-    // 1) Cas spécial : tout le monde "☕" → snapshot
+    // Cas spécial : tout le monde a joué "☕" : on sauvegarde un snapshot
     if (everyoneCoffee(votes, players)) {
       saveStateAsJson(
         {
@@ -90,40 +97,59 @@ export default function App() {
         },
         "snapshot-coffee.json"
       );
+      // On reste sur la même US mais on relance un tour
       setVotes({});
       setRevealed(false);
+      setRound(1);
       return;
     }
 
-    // 2) Calcul de la valeur finale pour cette US
+    // Calcul de la valeur finale pour cette US
     let finalValue = null;
 
     if (mode === "strict") {
+      // Mode strict : on veut l’unanimité, sinon on refait un tour
       if (!isUnanimous(votes, players)) {
-        // pas d'accord : on revote
         setVotes({});
         setRevealed(false);
+        setRound(1); // on considère que chaque essai est de nouveau un "tour 1"
         return;
       }
+      // Ici, tous les joueurs ont la même valeur
       finalValue = numericVotes.length ? numericVotes[0] : null;
     } else {
+      // Modes non stricts : moyenne / médiane / majorités
+      // Règle du sujet : le premier tour se joue à l’unanimité
       if (!isUnanimous(votes, players)) {
-        finalValue = applyRule(mode, votes);
+        if (round === 1) {
+          // Premier tour sans unanimité : on force un deuxième tour
+          setVotes({});
+          setRevealed(false);
+          setRound(2);
+          return;
+        } else {
+          // À partir du deuxième tour, on applique la règle choisie
+          finalValue = applyRule(mode, votes);
+        }
       } else {
+        // Unanimité atteinte (peu importe le tour)
         finalValue = numericVotes.length ? numericVotes[0] : null;
       }
     }
 
-    // 3) Mise à jour des résultats
+    // Mise à jour des résultats pour cette US
     const newFinals = { ...finals, [currId]: finalValue };
     setFinals(newFinals);
 
-    // 4) US suivante ou fin du backlog
+    // US suivante ou fin du backlog
     if (index < backlog.length - 1) {
+      // On passe à l’US suivante
       setIndex(index + 1);
       setVotes({});
       setRevealed(false);
+      setRound(1); // on revient au tour 1 pour la nouvelle US
     } else {
+      // Plus d’US dans le backlog : on exporte le fichier final
       saveStateAsJson(
         {
           mode,
@@ -137,10 +163,11 @@ export default function App() {
       setStarted(false);
       setVotes({});
       setRevealed(false);
+      setRound(1);
     }
   };
 
-  // Charger une partie sauvegardée
+  // Charger une partie sauvegardée (export)
   const onImportState = async (file) => {
     const state = await loadStateFromFile(file);
     if (!state) return;
@@ -153,6 +180,7 @@ export default function App() {
     setFinals(state.finals ?? {});
     setRevealed(false);
     setStarted(true);
+    setRound(1);
   };
 
   return (
@@ -180,7 +208,7 @@ export default function App() {
       {/* Zone de jeu : affichée seulement si la partie a démarré */}
       {currentUS && (
         <>
-          {/* US en cours*/}
+          {/* US en cours (affichage simple du titre / id) */}
           <section
             style={{
               marginTop: 16,
@@ -188,12 +216,18 @@ export default function App() {
               border: "1px solid #ddd",
               borderRadius: 8,
             }}
-          ></section>
+          >
+            <h2>US en cours</h2>
+            <p>
+              <strong>{currentUS.id}</strong> - {currentUS.title}
+            </p>
+            <p>Tour actuel : {round}</p>
+          </section>
 
           {/* Timer */}
           <Timer seconds={90} onTimeUp={() => setRevealed(true)} />
 
-          {/* Cartes : pour un joueur à la fois (vue contrôlée par viewPlayer) */}
+          {/* Cartes : vue pour un joueur à la fois */}
           <CardSet
             players={players}
             votes={votes}
@@ -212,7 +246,7 @@ export default function App() {
             onReveal={onReveal}
           />
 
-          {/* Résultat */}
+          {/* Résultat selon le mode choisi */}
           <ResultsPanel mode={mode} votes={votes} revealed={revealed} />
 
           {/* Boutons navigation */}
@@ -226,6 +260,7 @@ export default function App() {
               onClick={() => {
                 setVotes({});
                 setRevealed(false);
+                setRound(1);
               }}
             >
               Revoter
