@@ -1,7 +1,7 @@
 // Affiche les cartes pour le joueur sélectionné
 
 const CARDS = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100, "☕", "?"];
-
+//Cartes images
 const CARD_IMAGES = {
   0: "/cartes/cartes_0.svg",
   1: "/cartes/cartes_1.svg",

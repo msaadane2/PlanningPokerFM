@@ -313,13 +313,16 @@
 .mode-name {
   font-weight: 600;
   font-size: 0.96rem;
+  color: #ffffff;
 }
 
 .mode-id {
   font-size: 0.78rem;
-  color: var(--text-soft);
+  color: var(--text-main);
 }
-
+.mode-card-active .mode-name {
+  color: #ffffff;
+}
 .mode-desc {
   font-size: 0.8rem;
   color: var(--text-muted);
