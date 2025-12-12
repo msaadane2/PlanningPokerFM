@@ -1,5 +1,4 @@
 // Projet Planning Poker - Fatine & Manel (M1 Info)
-
 import { useState, useMemo, useEffect } from "react";
 import Menu from "./components/Menu.jsx";
 import CardSet from "./components/CardSet.jsx";
@@ -9,7 +8,6 @@ import Timer from "./components/Timer.jsx";
 import { saveStateAsJson, loadStateFromFile } from "./services/jsonManager.js";
 import { applyRule } from "./services/rules.js";
 import { isUnanimous, everyoneCoffee } from "./services/voteLogic.js";
-
 export default function App() {
   // États globaux de la partie
   const [players, setPlayers] = useState([]);
@@ -20,24 +18,19 @@ export default function App() {
   const [revealed, setRevealed] = useState(false);
   const [finals, setFinals] = useState({});
   const [started, setStarted] = useState(false);
-
-  // numéro du tour pour l’US courante (1 = premier tour)
+  // numéro du tour pour l'us courante , 1 = premier tour
   const [round, setRound] = useState(1);
-
-  // joueur dont on affiche les cartes (pour vue "un joueur à la fois")
+  // joueur dont on affiche les cartes; vue "un joueur à la fois"
   const [viewPlayer, setViewPlayer] = useState("");
-
-  // US en cours
+  // User story en cours
   const currentUS = started && backlog.length > 0 ? backlog[index] : undefined;
-
   // Votes numériques uniquement (on ignore café et ?)
   const numericVotes = useMemo(
     () => Object.values(votes).filter((v) => typeof v === "number"),
     [votes]
   );
-  // Tous les joueurs ont voté
+  // Tous les joueurs ont voté (sinon on ne peut pas révéler)
   const canReveal = players.length > 0 && players.every((p) => p in votes);
-
   // Garder une vue joueur cohérente quand la liste des joueurs change
   useEffect(() => {
     if (players.length === 0) {
@@ -47,8 +40,7 @@ export default function App() {
       setViewPlayer(players[0]);
     }
   }, [players, viewPlayer]);
-
-  // Lancer / relancer la partie
+  // Lancer ou bien  relancer la partie
   const handleStart = () => {
     if (players.length === 0) {
       alert("Ajoute au moins un joueur avant de lancer la partie.");
@@ -58,13 +50,12 @@ export default function App() {
       alert("Charge un backlog JSON avant de lancer la partie.");
       return;
     }
-
     setIndex(0);
     setVotes({});
     setRevealed(false);
     setFinals({});
     setStarted(true);
-    setRound(1); // on commence toujours au tour 1 pour la première US
+    setRound(1);
   };
 
   // Un joueur clique sur une carte
@@ -72,7 +63,6 @@ export default function App() {
     if (revealed) return; // si les cartes sont déjà révélées, on ne change plus
     setVotes((prev) => ({ ...prev, [player]: card }));
   };
-
   // Révéler les votes
   const onReveal = () => {
     setRevealed(true);
@@ -104,52 +94,44 @@ export default function App() {
       return;
     }
 
-    // Calcul de la valeur finale pour cette US
+    // Valeur finale de l’US
     let finalValue = null;
 
     if (mode === "strict") {
-      // Mode strict : on veut l’unanimité, sinon on refait un tour
+      // Mode strict : il faut l’unanimité sinon on recommence
       if (!isUnanimous(votes, players)) {
         setVotes({});
         setRevealed(false);
-        setRound(1); // on considère que chaque essai est de nouveau un "tour 1"
+        setRound(1);
         return;
       }
-      // Ici, tous les joueurs ont la même valeur
       finalValue = numericVotes.length ? numericVotes[0] : null;
     } else {
-      // Modes non stricts : moyenne / médiane / majorités
-      // Règle du sujet : le premier tour se joue à l’unanimité
+      // Modes non stricts : premier tour = unanimité, sinon 2eme tour règle
       if (!isUnanimous(votes, players)) {
         if (round === 1) {
-          // Premier tour sans unanimité : on force un deuxième tour
           setVotes({});
           setRevealed(false);
           setRound(2);
           return;
         } else {
-          // À partir du deuxième tour, on applique la règle choisie
           finalValue = applyRule(mode, votes);
         }
       } else {
-        // Unanimité atteinte (peu importe le tour)
         finalValue = numericVotes.length ? numericVotes[0] : null;
       }
     }
-
-    // Mise à jour des résultats pour cette US
+    // Sauvegarde du résultat de cette US
     const newFinals = { ...finals, [currId]: finalValue };
     setFinals(newFinals);
-
     // US suivante ou fin du backlog
     if (index < backlog.length - 1) {
-      // On passe à l’US suivante
       setIndex(index + 1);
       setVotes({});
       setRevealed(false);
-      setRound(1); // on revient au tour 1 pour la nouvelle US
+      setRound(1);
     } else {
-      // Plus d’US dans le backlog : on exporte le fichier final
+      //export des résultats
       saveStateAsJson(
         {
           mode,
@@ -166,8 +148,7 @@ export default function App() {
       setRound(1);
     }
   };
-
-  // Charger une partie sauvegardée (export)
+  // Importer une partie sauvegardée
   const onImportState = async (file) => {
     const state = await loadStateFromFile(file);
     if (!state) return;
@@ -186,7 +167,6 @@ export default function App() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
       <h1 style={{ textAlign: "center" }}>Planning Poker</h1>
-
       {/* Configuration de la partie */}
       <Menu
         players={players}
@@ -208,7 +188,7 @@ export default function App() {
       {/* Zone de jeu : affichée seulement si la partie a démarré */}
       {currentUS && (
         <>
-          {/* US en cours (affichage simple du titre / id) */}
+          {/* US en cours */}
           <section
             style={{
               marginTop: 16,
@@ -224,8 +204,13 @@ export default function App() {
             <p>Tour actuel : {round}</p>
           </section>
 
-          {/* Timer */}
-          <Timer seconds={90} onTimeUp={() => setRevealed(true)} />
+          {/* Timer => il repart à 90s quand on change d'US  ou de tour (round)
+           */}
+          <Timer
+            key={`${index}-${round}-${started}-${revealed}`}
+            seconds={90}
+            onTimeUp={() => setRevealed(true)}
+          />
 
           {/* Cartes : vue pour un joueur à la fois */}
           <CardSet
@@ -237,7 +222,7 @@ export default function App() {
             setViewPlayer={setViewPlayer}
           />
 
-          {/* Résumé des votes + bouton "Révéler" */}
+          {/* Résumé des votes + bouton Révéler */}
           <VoteBoard
             players={players}
             votes={votes}
@@ -256,6 +241,7 @@ export default function App() {
                 ? "Valider / US suivante"
                 : "Valider et exporter"}
             </button>
+
             <button
               onClick={() => {
                 setVotes({});
@@ -269,6 +255,7 @@ export default function App() {
         </>
       )}
 
+      {/* Message quand il n’y a pas de backlog chargé */}
       {!currentUS && backlog.length === 0 && (
         <p style={{ marginTop: 24, opacity: 0.8 }}>
           Charge un backlog JSON et configure la partie pour commencer.
