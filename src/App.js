@@ -5,6 +5,7 @@ import CardSet from "./components/CardSet.jsx";
 import VoteBoard from "./components/VoteBoard.jsx";
 import ResultsPanel from "./components/ResultsPanel.jsx";
 import Timer from "./components/Timer.jsx";
+import Chat from "./components/Chat.jsx";
 import { saveStateAsJson, loadStateFromFile } from "./services/jsonManager.js";
 import { applyRule } from "./services/rules.js";
 import { isUnanimous, everyoneCoffee } from "./services/voteLogic.js";
@@ -18,9 +19,9 @@ export default function App() {
   const [revealed, setRevealed] = useState(false);
   const [finals, setFinals] = useState({});
   const [started, setStarted] = useState(false);
-  // numéro du tour pour l'us courante , 1 = premier tour
+  // numéro du tour pour l’US courante (1 = premier tour)
   const [round, setRound] = useState(1);
-  // joueur dont on affiche les cartes; vue "un joueur à la fois"
+  // joueur dont on affiche les cartes
   const [viewPlayer, setViewPlayer] = useState("");
   // User story en cours
   const currentUS = started && backlog.length > 0 ? backlog[index] : undefined;
@@ -40,7 +41,8 @@ export default function App() {
       setViewPlayer(players[0]);
     }
   }, [players, viewPlayer]);
-  // Lancer ou bien  relancer la partie
+
+  // Lancer ou relancer la partie
   const handleStart = () => {
     if (players.length === 0) {
       alert("Ajoute au moins un joueur avant de lancer la partie.");
@@ -50,6 +52,7 @@ export default function App() {
       alert("Charge un backlog JSON avant de lancer la partie.");
       return;
     }
+
     setIndex(0);
     setVotes({});
     setRevealed(false);
@@ -63,6 +66,7 @@ export default function App() {
     if (revealed) return; // si les cartes sont déjà révélées, on ne change plus
     setVotes((prev) => ({ ...prev, [player]: card }));
   };
+
   // Révéler les votes
   const onReveal = () => {
     setRevealed(true);
@@ -71,9 +75,7 @@ export default function App() {
   // Passer à l’US suivante (ou finir le backlog)
   const onNext = () => {
     if (!currentUS) return;
-
     const currId = currentUS.id ?? `US${index + 1}`;
-
     // Cas spécial : tout le monde a joué "☕" : on sauvegarde un snapshot
     if (everyoneCoffee(votes, players)) {
       saveStateAsJson(
@@ -121,9 +123,11 @@ export default function App() {
         finalValue = numericVotes.length ? numericVotes[0] : null;
       }
     }
+
     // Sauvegarde du résultat de cette US
     const newFinals = { ...finals, [currId]: finalValue };
     setFinals(newFinals);
+
     // US suivante ou fin du backlog
     if (index < backlog.length - 1) {
       setIndex(index + 1);
@@ -131,7 +135,7 @@ export default function App() {
       setRevealed(false);
       setRound(1);
     } else {
-      //export des résultats
+      // export des résultats
       saveStateAsJson(
         {
           mode,
@@ -148,6 +152,7 @@ export default function App() {
       setRound(1);
     }
   };
+
   // Importer une partie sauvegardée
   const onImportState = async (file) => {
     const state = await loadStateFromFile(file);
@@ -167,6 +172,7 @@ export default function App() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
       <h1 style={{ textAlign: "center" }}>Planning Poker</h1>
+
       {/* Configuration de la partie */}
       <Menu
         players={players}
@@ -204,13 +210,15 @@ export default function App() {
             <p>Tour actuel : {round}</p>
           </section>
 
-          {/* Timer => il repart à 90s quand on change d'US  ou de tour (round)
-           */}
+          {/* Timer:  il repart à 90s quand on change d'US ou de tour (round) */}
           <Timer
             key={`${index}-${round}-${started}-${revealed}`}
             seconds={90}
             onTimeUp={() => setRevealed(true)}
           />
+
+          {/* Chat temps réel avec Firebase */}
+          <Chat player={viewPlayer || "Joueur"} />
 
           {/* Cartes : vue pour un joueur à la fois */}
           <CardSet
