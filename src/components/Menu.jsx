@@ -1,8 +1,6 @@
-// Menu de configuration: ajout joueurs, mode, backlog, sauvegarde
-
+// Menu de configuration : ajouter joueurs, choisir mode, importer backlog, sauvegarder/reprendre
 import { useRef, useState } from "react";
 import "./Menu.css";
-
 export default function Menu({
   players,
   setPlayers,
@@ -14,46 +12,66 @@ export default function Menu({
   onExportState,
   onStart,
 }) {
+  // champ texte pour ajouter un joueur
   const [newPlayer, setNewPlayer] = useState("");
+  // refs sur les inputs file
   const fileRefBacklog = useRef(null);
   const fileRefState = useRef(null);
-
+  // ajouter un joueur (si non vide et pas déjà dans la liste)
   const addPlayer = () => {
     const p = newPlayer.trim();
     if (!p || players.includes(p)) return;
     setPlayers([...players, p]);
     setNewPlayer("");
   };
-
+  // supprimer un joueur
   const removePlayer = (p) => {
     setPlayers(players.filter((x) => x !== p));
   };
-
+  // si on appuie sur Entrée, on ajoute le joueur
   const handleKeyDown = (e) => {
     if (e.key === "Enter") addPlayer();
   };
-
+  // importer un backlog JSON + vérifier qu'il a le bon format
   const importBacklog = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const text = await file.text();
     try {
       const json = JSON.parse(text);
-      setBacklog(json);
+      // on veut une liste (tableau) d'user stories
+      if (!Array.isArray(json))
+        throw new Error("Le backlog doit être une liste");
+      // chaque élément doit avoir au minimum id et title
+      const ok = json.every(
+        (x) =>
+          x &&
+          typeof x === "object" &&
+          typeof x.id === "string" &&
+          typeof x.title === "string"
+      );
+      if (!ok) throw new Error("Chaque US doit avoir id et title");
+      // on ajoute estimate si absent (ça aide pour l'export final)
+      const normalized = json.map((us) => ({
+        ...us,
+        estimate: us.estimate ?? null,
+      }));
+      setBacklog(normalized);
     } catch {
-      alert("Backlog JSON invalide.");
+      alert("Backlog JSON invalide (attendu: [{id, title, estimate?}]).");
     } finally {
+      // reset input file pour pouvoir re-importer le même fichier
       e.target.value = "";
     }
   };
-
+  // importer un état de partie (snapshot)
   const importState = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     onImportState?.(file);
     e.target.value = "";
   };
-
+  // liste des modes affichés dans le menu
   const modes = [
     {
       id: "strict",
@@ -81,15 +99,14 @@ export default function Menu({
       desc: "On garde la valeur la plus fréquente.",
     },
   ];
-
-  const canStart = players.length > 0 && backlog.length > 0;
-
+  // on peut lancer seulement si on a des joueurs + un backlog
+  const canStart =
+    players.length > 0 && Array.isArray(backlog) && backlog.length > 0;
   return (
     <div className="menu-root">
       <div className="menu-card">
         <h2 className="menu-title">Configuration de la partie</h2>
-
-        {/*Bloc joueurs */}
+        {/* Bloc joueurs */}
         <section className="menu-section">
           <div className="menu-section-header">
             <h3>Joueurs</h3>
@@ -97,7 +114,6 @@ export default function Menu({
               {players.length} joueur{players.length > 1 ? "s" : ""}
             </span>
           </div>
-
           <div className="players-row">
             <input
               type="text"
@@ -111,7 +127,6 @@ export default function Menu({
               Ajouter
             </button>
           </div>
-
           {players.length === 0 ? (
             <p className="hint">
               Ajoute au moins un joueur pour pouvoir lancer la partie.
@@ -136,13 +151,11 @@ export default function Menu({
             </ul>
           )}
         </section>
-
-        {/*Bloc mode de jeu*/}
+        {/* Bloc mode de jeu */}
         <section className="menu-section">
           <div className="menu-section-header">
             <h3>Mode de jeu</h3>
           </div>
-
           <div className="mode-grid">
             {modes.map((m) => {
               const active = mode === m.id;
@@ -151,6 +164,7 @@ export default function Menu({
                   key={m.id}
                   className={"mode-card" + (active ? " mode-card-active" : "")}
                   onClick={() => setMode(m.id)}
+                  type="button"
                 >
                   <div className="mode-name">{m.label}</div>
                   <div className="mode-id">{m.id}</div>
@@ -161,13 +175,11 @@ export default function Menu({
             })}
           </div>
         </section>
-
         {/* Bloc backlog & sauvegarde */}
         <section className="menu-section">
           <div className="menu-section-header">
             <h3>Backlog & sauvegarde</h3>
           </div>
-
           <div className="buttons-grid">
             {/* Import backlog */}
             <div className="btn-block">
@@ -184,13 +196,16 @@ export default function Menu({
               />
               <p className="hint small">
                 Format attendu : liste d’US{" "}
-                <code>[{"{ id, title, ... }"}]</code>
+                <code>[{"{ id, title, estimate? }"}]</code>
               </p>
             </div>
-
             {/* Export état */}
             <div className="btn-block">
-              <button className="btn secondary" onClick={onExportState}>
+              <button
+                className="btn secondary"
+                onClick={onExportState}
+                type="button"
+              >
                 Exporter l’état
               </button>
               <p className="hint small">
@@ -216,8 +231,7 @@ export default function Menu({
               </p>
             </div>
           </div>
-
-          {/* Petit résumé backlog */}
+          {/* Résumé backlog */}
           <div className="backlog-summary">
             <span className="backlog-dot" />
             {Array.isArray(backlog) && backlog.length > 0 ? (
@@ -230,13 +244,13 @@ export default function Menu({
             )}
           </div>
         </section>
-
-        {/*  Bouton pour démarrer la partie */}
+        {/* Bouton pour démarrer */}
         <div className="menu-footer">
           <button
             className="btn primary big"
             disabled={!canStart}
             onClick={onStart}
+            type="button"
           >
             Lancer la partie
           </button>

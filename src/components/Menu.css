@@ -1,3 +1,4 @@
+/* variables globales (couleurs, tailles, arrondis) */
 :root {
   --bg-body: #050816;
   --bg-card: #0b1220;
@@ -5,24 +6,24 @@
   --border-subtle: rgba(148, 163, 184, 0.25);
   --border-strong: rgba(148, 163, 184, 0.55);
 
-  --accent: #38bdf8; /* cyan */
+  --accent: #38bdf8; /* couleur principale */
   --accent-strong: #2563eb; /* bleu */
   --accent-pink: #ec4899; /* rose */
   --accent-purple: #a855f7; /* violet */
 
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
-  --text-soft: #6b7280;
+  --text-main: #e5e7eb; /* texte principal */
+  --text-muted: #9ca3af; /* texte secondaire */
+  --text-soft: #6b7280; /* texte discret */
 
-  --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.1);
-  --success-soft: rgba(34, 197, 94, 0.13);
+  --danger: #ef4444; /* couleur danger */
+  --danger-soft: rgba(239, 68, 68, 0.1); /* fond danger */
+  --success-soft: rgba(34, 197, 94, 0.13); /* fond succès */
 
-  --radius-card: 18px;
-  --radius-pill: 999px;
-  --shadow-soft: 0 20px 45px rgba(15, 23, 42, 0.85);
+  --radius-card: 18px; /* arrondi cartes */
+  --radius-pill: 999px; /* arrondi boutons */
+  --shadow-soft: 0 20px 45px rgba(15, 23, 42, 0.85); /* ombre */
 }
-
+/* conteneur principal du menu */
 .menu-root {
   min-height: 100vh;
   display: flex;
@@ -44,7 +45,7 @@
     sans-serif;
   color: var(--text-main);
 }
-
+/* carte principale du menu */
 .menu-card {
   width: 100%;
   max-width: 880px;
@@ -65,7 +66,7 @@
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(16px);
 }
-
+/* titre principal */
 .menu-title {
   margin: 0 0 18px;
   font-size: 1.95rem;
@@ -74,13 +75,13 @@
   align-items: center;
   gap: 10px;
 }
-
+/* texte secondaire du titre */
 .menu-title span {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text-muted);
 }
-
+/* ligne décorative sous le titre */
 .menu-title::after {
   content: "";
   flex: 1;
@@ -92,26 +93,26 @@
     transparent
   );
 }
-
+/* section du menu */
 .menu-section {
   margin-top: 20px;
   padding-top: 14px;
   border-top: 1px solid var(--border-subtle);
 }
-
+/* en-tête de section */
 .menu-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
 }
-
+/* titre de section */
 .menu-section-header h3 {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
 }
-
+/* badge (ex: nombre de joueurs) */
 .menu-section-badge {
   font-size: 0.78rem;
   padding: 4px 10px;
@@ -120,13 +121,13 @@
   border: 1px solid var(--border-strong);
   color: var(--text-muted);
 }
-
+/* ligne d'ajout des joueurs */
 .players-row {
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
 }
-
+/* champ de saisie */
 .input {
   flex: 1;
   border-radius: var(--radius-pill);
@@ -139,18 +140,18 @@
   transition: border 0.16s ease, box-shadow 0.16s ease, background 0.16s ease,
     transform 0.08s ease;
 }
-
+/* texte indicatif dans l'input */
 .input::placeholder {
   color: var(--text-soft);
 }
-
+/* effet au focus */
 .input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.85);
   background: #020617;
   transform: translateY(-0.5px);
 }
-
+/* style général des boutons */
 .btn {
   border: none;
   cursor: pointer;
@@ -166,73 +167,73 @@
     opacity 0.12s ease, border-color 0.12s ease;
   white-space: nowrap;
 }
-
+/* bouton principal */
 .btn.primary {
   background: linear-gradient(135deg, var(--accent-strong), var(--accent-pink));
   color: white;
   box-shadow: 0 12px 30px rgba(37, 99, 235, 0.55);
   border: 1px solid transparent;
 }
-
+/* hover: la souris passe au dessus:  bouton principal */
 .btn.primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 40px rgba(37, 99, 235, 0.7);
 }
-
+/* clic bouton principal */
 .btn.primary:active {
   transform: translateY(0);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.9);
 }
-
+/* bouton secondaire */
 .btn.secondary {
   background: rgba(15, 23, 42, 0.96);
   color: var(--text-main);
   border: 1px solid var(--border-strong);
 }
-
+/* hover bouton secondaire */
 .btn.secondary:hover {
   background: rgba(15, 23, 42, 1);
   border-color: var(--accent);
 }
-
+/* bouton fantôme */
 .btn.ghost {
   background: transparent;
   color: var(--text-main);
   border: 1px dashed var(--border-strong);
 }
-
+/* hover bouton fantôme */
 .btn.ghost:hover {
   background: rgba(15, 23, 42, 0.9);
   border-style: solid;
 }
-
+/* bouton icône */
 .btn.icon {
   padding: 4px 9px;
   font-size: 0.8rem;
 }
-
+/* bouton danger */
 .btn.danger {
   background: var(--danger-soft);
   color: #fecaca;
   border: 1px solid rgba(239, 68, 68, 0.6);
 }
-
+/* hover bouton danger */
 .btn.danger:hover {
   background: rgba(239, 68, 68, 0.18);
 }
-
+/* gros bouton */
 .btn.big {
   padding: 11px 22px;
   font-size: 0.98rem;
 }
-
+/* bouton désactivé */
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
-
+/* liste des joueurs */
 .players-list {
   list-style: none;
   margin: 4px 0 0;
@@ -240,7 +241,7 @@
   display: grid;
   gap: 8px;
 }
-
+/* élément joueur */
 .player-item {
   display: flex;
   align-items: center;
@@ -250,7 +251,7 @@
   background: linear-gradient(90deg, #020617, #020617);
   border: 1px solid rgba(31, 41, 55, 0.95);
 }
-
+/* avatar joueur */
 .player-avatar {
   width: 30px;
   height: 30px;
@@ -267,19 +268,19 @@
   font-weight: 600;
   color: white;
 }
-
+/* nom du joueur */
 .player-name {
   flex: 1;
   font-size: 0.95rem;
 }
-
+/* grille des modes de jeu */
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
   margin-top: 6px;
 }
-
+/* carte d'un mode */
 .mode-card {
   border-radius: 16px;
   padding: 10px 12px;
@@ -293,13 +294,13 @@
   transition: border 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease,
     background 0.15s ease;
 }
-
+/* hover carte mode */
 .mode-card:hover {
   border-color: rgba(148, 163, 184, 0.9);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.9);
   transform: translateY(-1px);
 }
-
+/* mode sélectionné */
 .mode-card-active {
   border-color: var(--accent);
   background: linear-gradient(
@@ -309,25 +310,27 @@
     rgba(236, 72, 153, 0.35)
   );
 }
-
+/* nom du mode */
 .mode-name {
   font-weight: 600;
   font-size: 0.96rem;
   color: #ffffff;
 }
-
+/* identifiant du mode */
 .mode-id {
   font-size: 0.78rem;
   color: var(--text-main);
 }
+/* couleur du nom quand actif */
 .mode-card-active .mode-name {
   color: #ffffff;
 }
+/* description du mode */
 .mode-desc {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
-
+/* badge "sélectionné" */
 .mode-selected {
   margin-top: 5px;
   font-size: 0.7rem;
@@ -337,43 +340,43 @@
   color: #bbf7d0;
   align-self: flex-start;
 }
-
+/* grille des boutons import/export */
 .buttons-grid {
   display: grid;
   gap: 12px;
   margin-top: 8px;
   align-items: flex-start;
 }
-
+/* disposition desktop */
 @media (min-width: 720px) {
   .buttons-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-
+/* bloc bouton */
 .btn-block {
   display: flex;
   flex-direction: column;
   gap: 4px;
   align-items: flex-start;
 }
-
+/* largeur des boutons dans la grille */
 .buttons-grid .btn {
   width: 100%;
   max-width: 200px;
   justify-content: center;
 }
-
+/* texte d'aide */
 .hint {
   margin: 4px 0 0;
   font-size: 0.8rem;
   color: var(--text-soft);
 }
-
+/* texte d'aide petit */
 .hint.small {
   font-size: 0.76rem;
 }
-
+/* style du code dans les hints */
 .hint code {
   margin-left: 4px;
   padding: 2px 4px;
@@ -383,7 +386,7 @@
   border: 1px solid rgba(55, 65, 81, 0.9);
   color: var(--text-muted);
 }
-
+/* résumé du backlog */
 .backlog-summary {
   margin-top: 14px;
   display: flex;
@@ -392,7 +395,7 @@
   font-size: 0.82rem;
   color: var(--text-muted);
 }
-
+/* point indicateur backlog */
 .backlog-dot {
   width: 9px;
   height: 9px;
@@ -400,7 +403,7 @@
   background: var(--accent);
   box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.4);
 }
-
+/* pied du menu */
 .menu-footer {
   margin-top: 22px;
   padding-top: 14px;
@@ -409,30 +412,25 @@
   flex-direction: column;
   gap: 8px;
 }
-
+/* responsive mobile : la largeur */
 @media (max-width: 600px) {
   .menu-card {
     padding: 20px 14px 22px;
   }
-
   .menu-title {
     font-size: 1.6rem;
     flex-direction: column;
     align-items: flex-start;
   }
-
   .menu-title::after {
     display: none;
   }
-
   .players-row {
     flex-direction: column;
   }
-
   .btn {
     width: 100%;
   }
-
   .btn.big {
     width: 100%;
   }

@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
 // Configuration firebase: un projet sur le quel nous avons déjà travaillé en L2
 const firebaseConfig = {
   apiKey: "AIzaSyAtMTnFUz0ZvnAvyfxa9yzqWr9dB59euqE",
