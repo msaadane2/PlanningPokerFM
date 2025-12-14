@@ -1,4 +1,6 @@
+//fonctions react
 import { useEffect, useState } from "react";
+//fonctions Firebase Firestore
 import {
   collection,
   addDoc,
@@ -9,9 +11,13 @@ import {
   doc,
   getDocs,
 } from "firebase/firestore";
+//connexion à la base Firebase
 import { db } from "../firebase";
+// composant Chat
 export default function Chat({ player = "Anonyme" }) {
+  // liste des messages du chat
   const [messages, setMessages] = useState([]);
+  // texte en cours d’écriture
   const [text, setText] = useState("");
   // Récupération des messages en temps réel
   useEffect(() => {
@@ -42,7 +48,6 @@ export default function Chat({ player = "Anonyme" }) {
     const snap = await getDocs(collection(db, "messages"));
     snap.forEach((d) => deleteDoc(d.ref));
   };
-
   return (
     <div
       style={{
@@ -96,7 +101,6 @@ export default function Chat({ player = "Anonyme" }) {
           </div>
         ))}
       </div>
-
       {/* Zone d’envoi */}
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
         <input

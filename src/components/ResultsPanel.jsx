@@ -1,10 +1,13 @@
+// fonction qui calcule le résultat selon le mode choisi
 import { applyRule } from "../services/rules.js";
-
+// composant qui affiche le résultat des votes
 export default function ResultsPanel({ mode, votes, revealed }) {
   return (
     <>
+      {/* styles CSS du panneau de résultat */}
       <style>
         {`
+        /* carte principale du résultat */
         .result-card {
           margin-top: 20px;
           padding: 16px;
@@ -16,19 +19,18 @@ export default function ResultsPanel({ mode, votes, revealed }) {
               rgba(168, 85, 247, 0.1)
             ),
             rgba(15, 23, 42, 0.95);
-
           border: 1px solid rgba(148, 163, 184, 0.4);
           backdrop-filter: blur(10px);
           box-shadow: 0 12px 26px rgba(15, 23, 42, 0.85);
           color: var(--text-main);
         }
-
+        /* titre du résultat */
         .result-title {
           font-size: 1.1rem;
           margin: 0 0 8px;
           font-weight: 600;
         }
-
+        /* valeur finale proposée */
         .result-value {
           font-size: 1.3rem;
           font-weight: 700;
@@ -36,8 +38,9 @@ export default function ResultsPanel({ mode, votes, revealed }) {
         }
         `}
       </style>
-
+      {/* bloc résultat */}
       <section className="result-card">
+        {/* si les votes ne sont pas encore révélés */}
         {!revealed ? (
           <>
             <h2 className="result-title">Résultat</h2>
@@ -45,6 +48,7 @@ export default function ResultsPanel({ mode, votes, revealed }) {
           </>
         ) : (
           <>
+            {/* affichage du résultat après révélation */}
             <h2 className="result-title">Résultat ({mode})</h2>
             <p>
               Valeur proposée :{" "}

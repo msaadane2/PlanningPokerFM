@@ -1,48 +1,55 @@
 // Projet Planning Poker - Fatine & Manel (M1 Info)
 import { useState, useMemo, useEffect } from "react";
+// composants de l'interface
 import Menu from "./components/Menu.jsx";
 import CardSet from "./components/CardSet.jsx";
 import VoteBoard from "./components/VoteBoard.jsx";
 import ResultsPanel from "./components/ResultsPanel.jsx";
 import Timer from "./components/Timer.jsx";
 import Chat from "./components/Chat.jsx";
+// services (JSON + règles + logique de vote)
 import { saveStateAsJson, loadStateFromFile } from "./services/jsonManager.js";
 import { applyRule } from "./services/rules.js";
 import { isUnanimous, everyoneCoffee } from "./services/voteLogic.js";
 export default function App() {
-  // États globaux de la partie
+  // liste des joueurs
   const [players, setPlayers] = useState([]);
+  // mode de jeu choisi (strict, moyenne)
   const [mode, setMode] = useState("strict");
+  // backlog : liste des user stories 
   const [backlog, setBacklog] = useState([]);
+  // index de l'US courante dans le backlog
   const [index, setIndex] = useState(0);
+  // votes en cours : { joueur: valeur }
   const [votes, setVotes] = useState({});
+  // est-ce qu'on a révélé les votes
   const [revealed, setRevealed] = useState(false);
+  // résultats par US (historique) 
   const [finals, setFinals] = useState({});
+  // est-ce que la partie a démarré
   const [started, setStarted] = useState(false);
-  // numéro du tour pour l’US courante (1 = premier tour)
+  // numéro du tour pour l'US courante (1 = premier tour)
   const [round, setRound] = useState(1);
-  // joueur dont on affiche les cartes
+  // joueur affiché (mode local : un joueur vote à la fois)
   const [viewPlayer, setViewPlayer] = useState("");
-  // User story en cours
+  // US en cours (si partie démarrée et backlog non vide)
   const currentUS = started && backlog.length > 0 ? backlog[index] : undefined;
-  // Votes numériques uniquement (on ignore café et ?)
+  // votes numériques seulement (on ignore ☕ et ?)
   const numericVotes = useMemo(
     () => Object.values(votes).filter((v) => typeof v === "number"),
     [votes]
   );
-  // Tous les joueurs ont voté (sinon on ne peut pas révéler)
+  // on peut révéler seulement si tout le monde a voté
   const canReveal = players.length > 0 && players.every((p) => p in votes);
-  // Garder une vue joueur cohérente quand la liste des joueurs change
+  // garder un viewPlayer valide quand les joueurs changent
   useEffect(() => {
     if (players.length === 0) {
       setViewPlayer("");
     } else if (!players.includes(viewPlayer)) {
-      // Si le joueur sélectionné n’existe plus, on prend le premier
-      setViewPlayer(players[0]);
+      setViewPlayer(players[0]); // si l'ancien n'existe plus, on prend le 1er
     }
   }, [players, viewPlayer]);
-
-  // Lancer ou relancer la partie
+  // démarrer la partie (ou relancer)
   const handleStart = () => {
     if (players.length === 0) {
       alert("Ajoute au moins un joueur avant de lancer la partie.");
@@ -52,7 +59,7 @@ export default function App() {
       alert("Charge un backlog JSON avant de lancer la partie.");
       return;
     }
-
+    // reset au début du backlog
     setIndex(0);
     setVotes({});
     setRevealed(false);
@@ -60,89 +67,80 @@ export default function App() {
     setStarted(true);
     setRound(1);
   };
-
-  // Un joueur clique sur une carte
+  // un joueur choisit une carte
   const onVote = (player, card) => {
-    if (revealed) return; // si les cartes sont déjà révélées, on ne change plus
+    if (revealed) return; // après révélation on bloque les changements
     setVotes((prev) => ({ ...prev, [player]: card }));
   };
-
-  // Révéler les votes
+  // révéler les votes
   const onReveal = () => {
     setRevealed(true);
   };
-
-  // Passer à l’US suivante (ou finir le backlog)
+  // valider l'US et passer à la suivante (ou finir le backlog)
   const onNext = () => {
     if (!currentUS) return;
+    // id de l'US (si jamais l'id n'existe pas)
     const currId = currentUS.id ?? `US${index + 1}`;
-    // Cas spécial : tout le monde a joué "☕" : on sauvegarde un snapshot
+    // si tout le monde a mis ☕ : on sauvegarde un snapshot et on recommence
     if (everyoneCoffee(votes, players)) {
       saveStateAsJson(
-        {
-          mode,
-          players,
-          backlog,
-          index,
-          votes,
-          finals,
-        },
+        { mode, players, backlog, index, votes, finals },
         "snapshot-coffee.json"
       );
-      // On reste sur la même US mais on relance un tour
+      // on reste sur la même US mais on relance le vote
       setVotes({});
       setRevealed(false);
       setRound(1);
       return;
     }
-
-    // Valeur finale de l’US
+    // valeur finale choisie pour cette US
     let finalValue = null;
-
     if (mode === "strict") {
-      // Mode strict : il faut l’unanimité sinon on recommence
+      // strict : unanimité obligatoire
       if (!isUnanimous(votes, players)) {
         setVotes({});
         setRevealed(false);
         setRound(1);
         return;
       }
+      // en unanimité, la valeur est la même pour tous
       finalValue = numericVotes.length ? numericVotes[0] : null;
     } else {
-      // Modes non stricts : premier tour = unanimité, sinon 2eme tour règle
+      // autres modes : tour 1 = unanimité, tour 2+ = règle (moyenne/médiane/majorité)
       if (!isUnanimous(votes, players)) {
         if (round === 1) {
+          // premier tour : on force une discussion puis revote
           setVotes({});
           setRevealed(false);
           setRound(2);
           return;
         } else {
+          // à partir du 2e tour : on applique la règle choisie
           finalValue = applyRule(mode, votes);
         }
       } else {
+        // si unanimité quand même, on prend la valeur
         finalValue = numericVotes.length ? numericVotes[0] : null;
       }
     }
-
-    // Sauvegarde du résultat de cette US
+    // on ajoute le résultat dans l'historique
     const newFinals = { ...finals, [currId]: finalValue };
     setFinals(newFinals);
-
-    // US suivante ou fin du backlog
+    // on écrit aussi l'estimation dans le backlog 
+    const updatedBacklog = backlog.map((us, i) =>
+      i === index ? { ...us, estimate: finalValue } : us
+    );
+    setBacklog(updatedBacklog);
+    // US suivante ou fin
     if (index < backlog.length - 1) {
       setIndex(index + 1);
       setVotes({});
       setRevealed(false);
       setRound(1);
     } else {
-      // export des résultats
+      // export final : backlog avec estimate pour chaque US
       saveStateAsJson(
-        {
-          mode,
-          players,
-          backlog,
-          results: newFinals,
-        },
+        { mode, players, backlog: updatedBacklog },
         "planning-poker-results.json"
       );
       alert("Backlog terminé. Résultats exportés en JSON.");
@@ -152,15 +150,18 @@ export default function App() {
       setRound(1);
     }
   };
-
-  // Importer une partie sauvegardée
+  // importer une partie sauvegardée (snapshot / état)
   const onImportState = async (file) => {
     const state = await loadStateFromFile(file);
     if (!state) return;
-
+    // on récupère backlog et on s'assure que estimate existe
+    const importedBacklog = (state.backlog ?? backlog).map((us) => ({
+      ...us,
+      estimate: us.estimate ?? null,
+    }));
     setMode(state.mode ?? mode);
     setPlayers(state.players ?? players);
-    setBacklog(state.backlog ?? backlog);
+    setBacklog(importedBacklog);
     setIndex(state.index ?? 0);
     setVotes(state.votes ?? {});
     setFinals(state.finals ?? {});
@@ -168,12 +169,10 @@ export default function App() {
     setStarted(true);
     setRound(1);
   };
-
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
       <h1 style={{ textAlign: "center" }}>Planning Poker</h1>
-
-      {/* Configuration de la partie */}
+      {/* menu de configuration */}
       <Menu
         players={players}
         setPlayers={setPlayers}
@@ -190,11 +189,10 @@ export default function App() {
         }
         onStart={handleStart}
       />
-
-      {/* Zone de jeu : affichée seulement si la partie a démarré */}
+      {/* zone de jeu : affichée uniquement si on a une US courante */}
       {currentUS && (
         <>
-          {/* US en cours */}
+          {/* affichage de l'US courante */}
           <section
             style={{
               marginTop: 16,
@@ -209,18 +207,15 @@ export default function App() {
             </p>
             <p>Tour actuel : {round}</p>
           </section>
-
-          {/* Timer:  il repart à 90s quand on change d'US ou de tour (round) */}
+          {/* timer : repart quand on change d'US ou de tour */}
           <Timer
             key={`${index}-${round}-${started}-${revealed}`}
             seconds={90}
             onTimeUp={() => setRevealed(true)}
           />
-
-          {/* Chat temps réel avec Firebase */}
+          {/* chat */}
           <Chat player={viewPlayer || "Joueur"} />
-
-          {/* Cartes : vue pour un joueur à la fois */}
+          {/* cartes : on vote pour le joueur sélectionné */}
           <CardSet
             players={players}
             votes={votes}
@@ -229,8 +224,7 @@ export default function App() {
             viewPlayer={viewPlayer}
             setViewPlayer={setViewPlayer}
           />
-
-          {/* Résumé des votes + bouton Révéler */}
+          {/* bloc votes + bouton révéler */}
           <VoteBoard
             players={players}
             votes={votes}
@@ -238,18 +232,15 @@ export default function App() {
             canReveal={canReveal}
             onReveal={onReveal}
           />
-
-          {/* Résultat selon le mode choisi */}
+          {/* panneau résultat*/}
           <ResultsPanel mode={mode} votes={votes} revealed={revealed} />
-
-          {/* Boutons navigation */}
+          {/* boutons d'action */}
           <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
             <button disabled={!revealed} onClick={onNext}>
               {index < backlog.length - 1
                 ? "Valider / US suivante"
                 : "Valider et exporter"}
             </button>
-
             <button
               onClick={() => {
                 setVotes({});
@@ -262,8 +253,7 @@ export default function App() {
           </div>
         </>
       )}
-
-      {/* Message quand il n’y a pas de backlog chargé */}
+      {/* message si pas de backlog */}
       {!currentUS && backlog.length === 0 && (
         <p style={{ marginTop: 24, opacity: 0.8 }}>
           Charge un backlog JSON et configure la partie pour commencer.

@@ -3,26 +3,21 @@
 //useEffect : pour exécuter le code automatiquement comme timer, reset
 //useRef : pour garder une valeur
 import { useEffect, useRef, useState } from "react";
-
 //Composant timer, reçoit seconds : le temps de départ, par défaut ici c 90 secondes; onTimeUp : une fonction à appeler quand le temps est fini
 export default function Timer({ seconds = 90, onTimeUp }) {
   //remaining c le nombre de secondes restantes affichées à l’écran, au début, remaining vaut "seconds"
   const [remaining, setRemaining] = useState(seconds);
-
   //alreadyCalledRef c un petit drapeau de true ou false; il sert à éviter d’appeler onTimeUp plusieurs fois
   //useRef utilisé car sa valeur peut changer sans recharger le composant
   const alreadyCalledRef = useRef(false);
-
   //remettre le timer à zéro
   //Ce useEffect se déclenche quand la valeur "seconds" change
   useEffect(() => {
     // On remet le temps restant à la nouvelle valeur
     setRemaining(seconds);
-
     // On remet le drapeau à false, le timer n’a pas encore fini
     alreadyCalledRef.current = false;
   }, [seconds]); //se déclenche quand seconds change
-
   //faire le décompte
   useEffect(() => {
     // Si le temps est terminé (0 ou moins)
@@ -46,7 +41,6 @@ export default function Timer({ seconds = 90, onTimeUp }) {
   }, [remaining, onTimeUp]);
   // dépendances :remaining : pour continuer le décompte
   // onTimeUp : pour être sûr d’avoir la bonne fonction
-
   // affichage du composant
   return (
     <>
