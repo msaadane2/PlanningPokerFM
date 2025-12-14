@@ -1,42 +1,52 @@
 [
   {
-    "id": "User Story 1",
-    "title": "Créer une session de jeu"
+    "id": "US1",
+    "title": "Créer une session de jeu",
+    "estimate": null
   },
   {
-    "id": "User Story 2",
-    "title": "Rejoindre une session existante avec un pseudo"
+    "id": "US2",
+    "title": "Rejoindre une session existante avec un pseudo",
+    "estimate": null
   },
   {
-    "id": "User Story 3",
-    "title": "Choisir un mode de jeu (strict, moyenne, médiane, majorité)"
+    "id": "US3",
+    "title": "Choisir un mode de jeu (strict, moyenne, médiane, majorité)",
+    "estimate": null
   },
   {
-    "id": "User Story 4",
-    "title": "Importer un backlog depuis un fichier JSON"
+    "id": "US4",
+    "title": "Importer un backlog depuis un fichier JSON",
+    "estimate": null
   },
   {
-    "id": "User Story 5",
-    "title": "Voter pour une estimation en sélectionnant une carte"
+    "id": "US5",
+    "title": "Voter pour une estimation en sélectionnant une carte",
+    "estimate": null
   },
   {
-    "id": "User Story 6 ",
-    "title": "Révéler les votes et afficher les écarts"
+    "id": "US6",
+    "title": "Révéler les votes et afficher les écarts",
+    "estimate": null
   },
   {
-    "id": "User Story 7 ",
-    "title": "Valider ou relancer le vote selon le mode choisi"
+    "id": "US7",
+    "title": "Valider ou relancer le vote selon le mode choisi",
+    "estimate": null
   },
   {
-    "id": "User Story 8",
-    "title": "Sauvegarder la partie en exportant l’état du backlog en JSON"
+    "id": "US8",
+    "title": "Sauvegarder la partie en exportant l’état du backlog en JSON",
+    "estimate": null
   },
   {
-    "id": "User Story 9",
-    "title": "Reprendre une partie à partir d’un fichier JSON"
+    "id": "US9",
+    "title": "Reprendre une partie à partir d’un fichier JSON",
+    "estimate": null
   },
   {
-    "id": "User Story 10",
-    "title": "Limiter le temps de vote avec un chronomètre"
+    "id": "US10",
+    "title": "Limiter le temps de vote avec un chronomètre",
+    "estimate": null
   }
 ]
