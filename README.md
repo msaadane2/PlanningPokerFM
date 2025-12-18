@@ -1,7 +1,7 @@
 # PlanningPokerFM
 Projet Planning Poker
-Binôme : Fatine Mourid & Manel Saadane
-Formation : Master 1 Informatique
+# Binôme Pair Programming: Fatine Mourid & Manel Saadane.
+Formation : Master 1 Informatique.
 Université : Icom - Université Lumière Lyon 2
 
 # 1. Présentation du projet
