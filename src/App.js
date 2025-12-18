@@ -171,7 +171,18 @@ export default function App() {
   };
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
-      <h1 style={{ textAlign: "center" }}>Planning Poker</h1>
+      <h1
+        style={{
+          textAlign: "center",
+          background:
+            "linear-gradient(90deg, #38bdf8, #2563eb, #ec4899, #a855f7)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          fontWeight: "bold",
+        }}
+      >
+        Bienvenue sur l’application de Planning Poker{" "}
+      </h1>
       {/* menu de configuration */}
       <Menu
         players={players}
@@ -201,7 +212,20 @@ export default function App() {
               borderRadius: 8,
             }}
           >
-            <h2>US en cours</h2>
+            <h2
+              style={{
+                width: "100%",
+                textAlign: "center",
+                margin: 0,
+                fontWeight: "bold",
+                background:
+                  "linear-gradient(90deg, #38bdf8, #2563eb, #ec4899, #a855f7)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              User Story en cours
+            </h2>
             <p>
               <strong>{currentUS.id}</strong> - {currentUS.title}
             </p>

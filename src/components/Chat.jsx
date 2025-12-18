@@ -60,7 +60,16 @@ export default function Chat({ player = "Anonyme" }) {
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         {}
-        <h3 style={{ color: "#e5e7eb", margin: 0 }}>💬 Chat</h3>
+        <h3
+          style={{
+            margin: 0,
+            color: "#e5e7eb",
+            width: "100%",
+          }}
+        >
+          Échanges entre joueurs
+        </h3>
+
         <button className="btn danger" onClick={deleteAllMessages}>
           Tout supprimer
         </button>

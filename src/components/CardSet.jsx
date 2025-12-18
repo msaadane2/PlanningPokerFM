@@ -18,10 +18,10 @@ const CARD_IMAGES = {
 };
 export default function CardSet({
   players, // liste des joueurs
-  votes,// votes actuels { joueur: valeur }
-  onVote,  // fonction appelée quand un joueur vote
+  votes, // votes actuels { joueur: valeur }
+  onVote, // fonction appelée quand un joueur vote
   disabled, // désactive le vote si les cartes sont révélées
-  viewPlayer,// joueur actuellement affiché
+  viewPlayer, // joueur actuellement affiché
   setViewPlayer, // change le joueur affiché
 }) {
   // joueur courant valide (sinon chaîne vide)
@@ -123,7 +123,21 @@ export default function CardSet({
       {/* zone principale des cartes */}
       <section className="cards-root">
         <div className="cards-header">
-          <h2>Cartes</h2>
+          <h2
+            style={{
+              width: "100%",
+              textAlign: "center",
+              margin: 0,
+              fontWeight: "bold",
+              background:
+                "linear-gradient(90deg, #38bdf8, #2563eb, #ec4899, #a855f7)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Vote par cartes de Planning Poker{" "}
+          </h2>
+
           {/* choix du joueur à afficher */}
           {players.length > 0 && (
             <select
