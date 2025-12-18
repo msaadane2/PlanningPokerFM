@@ -40,9 +40,19 @@ docs/
 
 Le backlog est fourni sous la forme d’un tableau de user stories :Le champ "estimate" est automatiquement renseigné à la fin du Planning Poker.
 
+Chaque user story contient :
+- un identifiant (`id`)
+- un titre (`title`)
+- une estimation (`estimate`), renseignée automatiquement à la fin du Planning Poker.
+
+Un fichier exemple `Backlog.json` est fourni dans le dossier `src/` afin d’illustrer le format attendu et de faciliter les tests de l’application.
+
+
 
 # 5. Lancer le projet en local
-
+### Prérequis
+- Node.js ≥ 20
+- pnpm
 Installation des dépendances :
 pnpm install
 
@@ -74,5 +84,6 @@ Les fichiers HTML sont générés dans le dossier "docs".
 - Stockage des données : fichiers JSON
 - Chat : Firebase Firestore
 - Documentation : JSDoc
+- Intégration continue : GitHub Actions (tests + documentation)
 
 
