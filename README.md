@@ -52,6 +52,7 @@ Un fichier exemple `Backlog.json` est fourni dans le dossier `src/` afin d’ill
 ### Prérequis
 - Node.js 
 - pnpm
+  
 Installation des dépendances :
 - pnpm install: installe l’ensemble des dépendances du projet
 - pnpm install firebase : installe Firebase, utilisé dans l’application pour la fonctionnalité de chat 
