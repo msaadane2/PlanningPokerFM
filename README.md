@@ -86,4 +86,8 @@ Les fichiers HTML sont générés dans le dossier "docs".
 - Documentation : JSDoc
 - Intégration continue : GitHub Actions (tests + documentation)
 
+# 8. Déploiement 
+https://fmplanningpoker.vercel.app/
+
+
 
