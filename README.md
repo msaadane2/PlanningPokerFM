@@ -32,8 +32,7 @@ src/
  - services/  : logique métier (règles de vote, json, unanimité)
  - App.jsx : composant principal de l’application
  - firebase.js: configuration Firebase
-docs/
- - documentation HTML générée automatiquement avec JSDoc
+ - docs/ : documentation HTML générée automatiquement avec JSDoc
 
 
 # 4. Format du blacklog
@@ -54,7 +53,8 @@ Un fichier exemple `Backlog.json` est fourni dans le dossier `src/` afin d’ill
 - Node.js ≥ 20
 - pnpm
 Installation des dépendances :
-pnpm install
+pnpm install: installe l’ensemble des dépendances du projet
+pnpm install firebase : installe Firebase, utilisé dans l’application pour la fonctionnalité de chat 
 
 Lancement de l’application :
 pnpm run dev
