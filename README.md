@@ -50,14 +50,14 @@ Un fichier exemple `Backlog.json` est fourni dans le dossier `src/` afin d’ill
 
 # 5. Lancer le projet en local
 ### Prérequis
-- Node.js ≥ 20
+- Node.js 
 - pnpm
 Installation des dépendances :
-pnpm install: installe l’ensemble des dépendances du projet
-pnpm install firebase : installe Firebase, utilisé dans l’application pour la fonctionnalité de chat 
+- pnpm install: installe l’ensemble des dépendances du projet
+- pnpm install firebase : installe Firebase, utilisé dans l’application pour la fonctionnalité de chat 
 
 Lancement de l’application :
-pnpm run dev
+- pnpm run dev
 
 
 # 6. Tests unitaires
